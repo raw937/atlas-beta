@@ -41,15 +41,17 @@ configfile: "./config/atlas_config.yaml"
 
 EID = config['eid']
 SAMPLES = get_samples(os.path.join("data", EID), 200)
-CONTAMINANT_DBS = pattern_search("databases/contaminant", ["*.fa", "*.fasta"])
-FUNCTIONAL_DBS = pattern_search("databases/functional", ["*.fa", "*.fasta"])
-TAXONOMIC_DBS = pattern_search("databases/taxonomic", ["*.fa", "*.fasta"])
 
 DECON_DBS = list(config["contamination_filtering"]["references"].keys())
-
+FUNCTIONAL_DBS = list(config['functional_db_formatting']['references'].keys())
+TAXONOMIC_DBS = list(config['taxonomic_db_formatting']['references'].keys())
 
 rule all:
     input:
+        expand("databases/contaminant/{db}.dmnd", db=DECON_DBS),
+        expand("databases/functional/{db}.dmnd", db=FUNCTIONAL_DBS),
+        expand("databases/taxonomic/{db}.dmnd", db=TAXONOMIC_DBS),
+
         expand("results/{eid}/joined/{sample}.extendedFrags.fastq", eid=EID, sample=SAMPLES),
         expand("results/{eid}/joined/{sample}.hist", eid=EID, sample=SAMPLES),
         expand("results/{eid}/joined/{sample}.notCombined_1.fastq", eid=EID, sample=SAMPLES),
@@ -59,40 +61,36 @@ rule all:
         expand("results/{eid}/fastqc/{sample}_clean_qual_fastqc.zip", eid=EID, sample=SAMPLES),
         expand("results/{eid}/fastqc/{sample}_clean_qual_fastqc.html", eid=EID, sample=SAMPLES)
 
+rule build_contaminant_databases:
+    input:
+        "databases/contaminant/{db}"
+    output:
+        "databases/contaminant/{db}.dmnd"
+    message:
+        "Formatting contaminant databases"
+    shell:
+        "diamond makedb --in {input} --d {output}"
 
 rule build_functional_databases:
     input:
-        functional_db = "databases/functional/{db}"
+        "databases/functional/{db}"
     output:
-        f1 = "databases/functional/{db}.bck",
-        f2 = "databases/functional/{db}.des",
-        f3 = "databases/functional/{db}.prj",
-        f4 = "databases/functional/{db}.sds",
-        f5 = "databases/functional/{db}.ssp",
-        f6 = "databases/functional/{db}.suf",
-        f7 = "databases/functional/{db}.tis",
-        f8 = "databases/functional/{db}-names.txt"
+        "databases/functional/{db}.dmnd"
     message:
         "Formatting functional databases"
     shell:
-        "lastdb+ {input.functional_db} {input.functional_db} -p"
+        "diamond makedb --in {input} --d {output}"
 
 
 rule build_taxonomic_databases:
     input:
-        taxonomic_db = "databases/taxonomic/{db}"
+        "databases/taxonomic/{db}"
     output:
-        f1 = "databases/taxonomic/{db}.bck",
-        f2 = "databases/taxonomic/{db}.des",
-        f3 = "databases/taxonomic/{db}.prj",
-        f4 = "databases/taxonomic/{db}.sds",
-        f5 = "databases/taxonomic/{db}.ssp",
-        f6 = "databases/taxonomic/{db}.suf",
-        f7 = "databases/taxonomic/{db}.tis"
+        "databases/taxonomic/{db}.dmnd",
     message:
         "Formatting taxonomic databases"
     shell:
-        "lastdb+ {input.taxonomic_db} {input.taxonomic_db}"
+        "diamond makedb --in {input} --d {output}"
 
 
 rule quality_filter_reads:
