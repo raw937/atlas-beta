@@ -1,7 +1,7 @@
 eid: test
 phred_offset: 33
 filtering:
-    threads: 4
+    threads: 24
     # fastas to parse into kmers which are then trimmed from the sequences
     adapters: ref/adapters.fa.gz
     # Look for shorter kmers at read tips down to this length; 0 disables
@@ -33,12 +33,22 @@ filtering:
     # The number of bases to remove from the start of the read; 0 disables
     headcrop: 0
 merging:
-    threads: 4
+    threads: 24
     minimum_overlap: 30
     maximum_overlap: 220
     maximum_mismatch_density: 0.25
+functional_db_formatting:
+    threads: 24
+    references:
+        eggnog: databases/functional/eggnog4.proteins.all.faa
+        refseq: databases/functional/refseq78.complete.nonredundant_protein.faa
+taxonomic_db_formatting:
+    threads: 24
+    references:
+        lsu_rrna: databases/taxonomic/SILVA_128_LSURef_tax_silva.fasta
+        ssu_rrna: databases/taxonomic/SILVA_128_SSURef_tax_silva.fasta
 contamination_filtering:
-    threads: 12
+    threads: 24
     references:
         ecoli: databases/contaminant/Escherichia_coli_K-12.fa
         phiX: databases/contaminant/phiX174_virus.fa
@@ -83,7 +93,7 @@ annotation:
     translation_table: 11
 
 binning:
-    threads: 12
+    threads: 24
     minimum_contig_length: 1000
     # iterations of Expectation-Maximization algorithm
     maximum_iterations: 50
