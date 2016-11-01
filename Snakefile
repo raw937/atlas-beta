@@ -207,24 +207,24 @@ rule decontaminate_joined:
 #                   --fastq_maxee {params.maxee} --fastq_maxns {params.maxns}"""
 
 
-rule subset_reads_by_quality:
-    input:
-        "results/{eid}/decon/{sample}_clean.fastq.gz"
-    output:
-        "results/{eid}/quality_filter/{sample}_clean_qual.fastq"
-    params:
-        adapter_clip = "" if not config["filtering"].get("adapters", "") else "ILLUMINACLIP:%s:%s" % (config["filtering"]["adapters"], config["filtering"].get("adapter_clip", "2:30:10"))
-        window_size_qual = "" if not config["filtering"].get("window_size_quality", "") else "SLIDINGWINDOW:%s" % config["filtering"]["window_size_quality"]
-        leading = "" if not config["filtering"].get("leading", 0) else "LEADING:%s" % config["filtering"]["leading"]
-        trailing = "" if not config["filtering"].get("trailing", 0) else "TRAILING:%s" % config["filtering"]["trailing"]
-        crop = "" if not config["filtering"].get("crop", 0) else "CROP:%s" % config["filtering"]["crop"]
-        headcrop = "" if not config["filtering"].get("headcrop", 0) else "HEADCROP:%s" % config["filtering"]["headcrop"]
-        minlen = "MINLEN:%s" % config["filtering"]["minimum_passing_read_length"]
-    threads:
-        24
-    shell:
-        """trimmomatic SE -threads {threads} {input} {output} {params.adapter_clip} \
-               {params.leading} {params.trailing} {params.window_size_qual} {params.minlen}"""
+# rule subset_reads_by_quality:
+#     input:
+#         "results/{eid}/decon/{sample}_clean.fastq.gz"
+#     output:
+#         "results/{eid}/quality_filter/{sample}_clean_qual.fastq"
+#     params:
+#         adapter_clip = "" if not config["filtering"].get("adapters", "") else "ILLUMINACLIP:%s:%s" % (config["filtering"]["adapters"], config["filtering"].get("adapter_clip", "2:30:10"))
+#         window_size_qual = "" if not config["filtering"].get("window_size_quality", "") else "SLIDINGWINDOW:%s" % config["filtering"]["window_size_quality"]
+#         leading = "" if not config["filtering"].get("leading", 0) else "LEADING:%s" % config["filtering"]["leading"]
+#         trailing = "" if not config["filtering"].get("trailing", 0) else "TRAILING:%s" % config["filtering"]["trailing"]
+#         crop = "" if not config["filtering"].get("crop", 0) else "CROP:%s" % config["filtering"]["crop"]
+#         headcrop = "" if not config["filtering"].get("headcrop", 0) else "HEADCROP:%s" % config["filtering"]["headcrop"]
+#         minlen = "MINLEN:%s" % config["filtering"]["minimum_passing_read_length"]
+#     threads:
+#         24
+#     shell:
+#         """trimmomatic SE -threads {threads} {input} {output} {params.adapter_clip} \
+#                {params.leading} {params.trailing} {params.window_size_qual} {params.minlen}"""
 
 
 rule fastqc:
